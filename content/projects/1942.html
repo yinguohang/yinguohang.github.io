@@ -1,23 +1,38 @@
+<script>
+$(function() {
+  $('#myCarousel').on('slide.bs.carousel', function (e) {
+    var div = e.relatedTarget;
+    var target = $(div).attr("order");
+    console.log(target);
+    $("#explaination").children().css("display", "none");
+    $("#explaination"+target).fadeIn();
+  });
+});
+</script>
 <style>
-/* CUSTOMIZE THE CAROUSEL
--------------------------------------------------- */
+  /* CUSTOMIZE THE CAROUSEL
+  -------------------------------------------------- */
 
-/* Carousel base class */
-.carousel {
-  height: 622px;
-  width: 392px;
-  margin-bottom: 60px;
-}
-/* Since positioning the image, we need to help out the caption */
-.carousel-caption {
-  z-index: 10;
-  width: 100%;
-}
+  /* Carousel base class */
+  .carousel {
+    height: 622px;
+    width: 392px;
+    margin-bottom: 60px;
+  }
+  /* Since positioning the image, we need to help out the caption */
+  .carousel-caption {
+    z-index: 10;
+    width: 100%;
+  }
 
-/* Declare heights because of positioning of img element */
-.carousel .item {
-  height: 622px;
-}
+  /* Declare heights because of positioning of img element */
+  .carousel .item {
+    height: 622px;
+  }
+
+  .font20 {
+    font-size:20px;
+  }
 
   h2{
     font-family: Comic Sans MS;
@@ -56,28 +71,28 @@ This is our college's project that we need to finish one of the games provided b
         <li data-target="#myCarousel" data-slide-to="7"></li>
       </ol>
       <div class="carousel-inner" role="listbox">
-        <div class="item active">
+        <div class="item active" order="0">
           <img src="asset/1942/start_menu.png" weight="100%"/>
         </div>
-        <div class="item">
+        <div class="item" order="1">
           <img src="asset/1942/model_select.png" weight="100%"/>
         </div>
-        <div class="item">
+        <div class="item" order="2">
           <img src="asset/1942/instruction1.png" weight="100%"/>
         </div>
-        <div class="item">
+        <div class="item" order="3">
           <img src="asset/1942/instruction2.png" weight="100%"/>
         </div>
-        <div class="item">
+        <div class="item" order="4">
           <img src="asset/1942/high_score.png" weight="100%"/>
         </div>
-        <div class="item">
+        <div class="item" order="5">
           <img src="asset/1942/easy_mode.png" weight="100%"/>
         </div>
-        <div class="item">
+        <div class="item" order="6">
           <img src="asset/1942/boss.png" weight="100%"/>
         </div>
-        <div class="item">
+        <div class="item" order="7">
           <img src="asset/1942/game_over.png" weight="100%"/>
         </div>
       </div>
@@ -92,6 +107,52 @@ This is our college's project that we need to finish one of the games provided b
     </div><!-- /.carousel -->
   </div>
   <div class="col-lg-6">
+    <div id="explaination">
+      <div id="explaination0">      
+      <p class="font20">The first scene players see will be the main menu. The player can start a game, select mode, view the instructions and watch the record of his last time of play.</p>
+      </div>
+      <div id="explaination1" style="display: none">      
+      <p class="font20">Model Selection Scene: in this page players can select the mode. Endless mode will be available after the hard mode is passed.</p>
+      </div>
+      <div id="explaination2" style="display: none">      
+      <p class="font20">Instruction Page: Provide a detailed instruction of the operation method and the function of items.</p>
+      </div>
+      <div id="explaination3" style="display: none">           
+      <p class="font20">Instruction Page: Provide a detailed instruction of the operation method and the function of items.</p>
+      </div>      
+      <div id="explaination4" style="display: none">      
+      <p class="font20">An example of easy mode.</p>
+      <p class="font20">
+      After starting the game, the player can use direction keys “↑↓←→” to move and “space” key to attack. 
+      At the bottom, there are indicators of score and HP. If the player’s plane is attacked by enemy or its bullet, the HP will get down. The game will come to an end if the HP is lower or equal to zero.
+      When an enemy plane crashes, there may be a random remain left. It may be a heart, which can recover your “HP”, a green “P”, which can protect you against the bullet of enemy and itself, a yellow “C”, which can make all enemies on the screen crash and a poison, whose effect equals the damage brought by the bullet.
+      For further instructions, players can go to the instruction
+      </p>
+      </div>
+      <div id="explaination5" style="display: none">      
+      <p class="font20">High score list to show the top5 scores.</p>
+      </div>
+      <div id="explaination6" style="display: none">      
+      <p class="font20">An example of Boss.</p>
+      </div>
+      <div id="explaination7" style="display: none">           
+      <p class="font20">Game over page.</p>
+      </div>      
+    </div>
   </div>
 </div>
+</section>
+<section>
+  <h2>Difficulties</h2>
+  <div class="font20">
+    <ul>
+      <li>To make the game scalable, I design the base class plane and other planes are inherited from it. If I want to design some planes in future, I can just write a new class inherited from the base class. So as other things, such as scenes.</li>
+      <li>When implementing the “save/load” function(the player can press “Load” to see the record of last time), I originately record each keyboard activity of the player with time stamp, however, it has lots of little offset caused by round-off of time which will finally cause the record is different from the originate scenes. Finally I choose the time stamp whose unit is clock, whose type is integer to avoid the problem.</li>
+      <li>To make the code readable and easy to maintain, I separate the logic code and the drawing code.</li>
+    </ul>
+  </div>
+</section>
+<section>
+  <h2>Architecture</h2>
+  <img src="asset/1942/architecture.png" width="100%"/>
 </section>
