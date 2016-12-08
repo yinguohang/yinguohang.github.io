@@ -1,13 +1,13 @@
 <script>
-$(function() {
-  $('#myCarousel').on('slide.bs.carousel', function (e) {
-    var div = e.relatedTarget;
-    var target = $(div).attr("order");
-    console.log(target);
-    $("#explaination").children().css("display", "none");
-    $("#explaination"+target).fadeIn();
+  $(function() {
+    $('#myCarousel').on('slide.bs.carousel', function (e) {
+      var div = e.relatedTarget;
+      var target = $(div).attr("order");
+      console.log(target);
+      $("#explaination").children().css("display", "none");
+      $("#explaination"+target).fadeIn();
+    });
   });
-});
 </script>
 <style>
   /* CUSTOMIZE THE CAROUSEL
