@@ -10,9 +10,12 @@
 </head>
 <body>
   <style>
+    :root {
+      --bg-color: black;
+    };
     .round-button{
       border-radius: 50%;
-      background: white;
+      background: var(--bg-color);
       height: 40px;
       width: 40px;
       padding: 6px 8px;
@@ -50,14 +53,17 @@
       color: #373E40;
     }
     .side-button{
-      background:black;
+      background:var(--bg-color);
       color:white;
       font-size: 20px;
       padding: 5px;
       text-align: center;
       border-bottom-style: solid;
-      border-color: white;
       border-bottom-width: 2px;
+      border-color: white;
+      cursor:pointer;
+    }
+    a {
       cursor:pointer;
     }
   </style>
@@ -116,16 +122,20 @@
       });   
     });
   </script>
-  <header class="jumbotron" style="height: 240px; background: black; color: white">
+  <header class="jumbotron" style="height: 240px; background: var(--bg-color); color: white">
     <div class="container" style="height: 100%">
       <div class="row" style="height: 100%">
         <div class="col-lg-6" style="height: 100%">
-          <a href="https://github.com/yinguohang"><img style="position:absolute; bottom:40px; left:500px;" width="64px" height="64px"
-            src="asset/GitHub-Mark-Light-64px.png"
-            /></a>
-          <h1 style="position:absolute; bottom:60px; font-family: Comic Sans MS;">Yin, Guohang</h1>
-          <h4 style="position:absolute; bottom:20px;  font-family: Comic Sans MS;">University of Southern California, Computer Science</h4>
-          <h4 style="position:absolute; bottom:0px;  font-family: Comic Sans MS;">Shanghai Jiao Tong University, Software Engineering</h4>
+          <p style="font-size: 50px; font-weight: 400;">Yin, Guohang</p>
+          <p style="color: #CCCCCC; font-size: 12px; letter-spacing: 1px">University of Southern California, Computer Science<br>Shanghai Jiao Tong University, Software Engineering</p>
+          <div style="vertical-align:top;">
+            <a href="https://github.com/yinguohang" style="display:inline-block; vertical-align: top">
+              <img width="32px" height="32px" src="asset/GitHub-Mark-Light-64px.png" style="cursor:pointer"/>
+            </a>
+            <a href="files/USC-YIN Guohang-CV-v2.pdf" style="display:inline-block; vertical-align: top; margin-left: 5px">
+              <span class="glyphicon glyphicon-file" aria-hidden="true" style="color: white; font-size: 32px; cursor:pointer"></span>
+            </a>
+          </div>
         </div>
       </div>
     </div>
