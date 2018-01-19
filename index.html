@@ -63,6 +63,11 @@
       border-color: white;
       cursor:pointer;
     }
+    .vcenter {
+      vertical-align: bottom; 
+      display: inline-block;
+      float: none;
+    }
     a {
       cursor:pointer;
     }
@@ -122,12 +127,16 @@
       });   
     });
   </script>
-  <header class="jumbotron" style="height: 240px; background: var(--bg-color); color: white">
-    <div class="container" style="height: 100%">
+  <div class="container-fluid" style="background-color: black; color:white;">
+    <div class="container" style="padding-top:20px; padding-bottom: 20px">
       <div class="row" style="height: 100%">
-        <div class="col-lg-6" style="height: 100%">
-          <p style="font-size: 50px; font-weight: 400;">Yin, Guohang</p>
+        <div class="col-lg-4" style="margin-top:0px;">
+          <p style="font-size: 50px; font-weight: 400; margin-bottom: -30px">Yin, Guohang</p>
+        </div>
+        <div class="col-lg-4" style="padding-top:30px; margin-bottom: -30px">
           <p style="color: #CCCCCC; font-size: 12px; letter-spacing: 1px">University of Southern California, Computer Science<br>Shanghai Jiao Tong University, Software Engineering</p>
+        </div>
+        <div class="col-lg-4" style="padding-top:30px">
           <div style="vertical-align:top;">
             <a href="https://github.com/yinguohang" style="display:inline-block; vertical-align: top">
               <img width="32px" height="32px" src="asset/GitHub-Mark-Light-64px.png" style="cursor:pointer"/>
@@ -139,8 +148,8 @@
         </div>
       </div>
     </div>
-  </header>
-  <div class="container" style="margin-top: -30px">
+  </div>
+  <div class="container">
     <div class="row">
       <div class="col-lg-2 col-sm-12">
         <div class="row">
