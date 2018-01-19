@@ -13,15 +13,6 @@
     :root {
       --bg-color: black;
     };
-    .round-button{
-      border-radius: 50%;
-      background: var(--bg-color);
-      height: 40px;
-      width: 40px;
-      padding: 6px 8px;
-      cursor: pointer;
-      color: black;
-    }
     .return-button{
       cursor:pointer;
       color:grey;
@@ -74,14 +65,6 @@
   </style>
   <script>
     $(function(){
-      $(".round-button").mouseover(function(){
-        var target = $(this).attr("target");
-        $(target).fadeIn();
-      });
-      $(".round-button").mouseout(function(){
-        var target = $(this).attr("target");
-        $(target).fadeOut();
-      });
       $(".return-button").click(function(){
         $("#detail").css("display", "none");
         $("#catagory").fadeIn("slow");
@@ -100,11 +83,6 @@
       });
       $(".side-button").click(function(){
         var target = "#" + $(this).attr("target");
-        /*
-        $("#content").children().each(function(){
-          $(this).css("display", "none");
-        });
-        */
         $(".side-button").each(function(){
           var target = "#" + $(this).attr("target");
           $(target).css("display", "none");
@@ -145,13 +123,13 @@
   <div class="container-fluid" style="background-color: black; color:white;">
     <div class="container" style="padding-top:20px; padding-bottom: 20px">
       <div class="row" style="height: 100%">
-        <div class="col-lg-4" style="margin-top:0px;">
+        <div class="col-lg-4 col-md-5 col-sm-6" style="margin-top:0px;">
           <p style="font-size: 50px; font-weight: 400; margin-bottom: -30px">Yin, Guohang</p>
         </div>
-        <div class="col-lg-4" style="padding-top:30px; margin-bottom: -30px">
+        <div class="col-lg-4 col-md-5 col-sm-6" style="padding-top:30px; margin-bottom: -30px">
           <p style="color: #CCCCCC; font-size: 12px; letter-spacing: 1px">University of Southern California, Computer Science<br>Shanghai Jiao Tong University, Software Engineering</p>
         </div>
-        <div class="col-lg-4" style="padding-top:30px">
+        <div class="col-lg-4 col-md-2 col-sm-6" style="padding-top:30px">
           <div style="vertical-align:top;">
             <a href="https://github.com/yinguohang" style="display:inline-block; vertical-align: top">
               <img width="32px" height="32px" src="asset/GitHub-Mark-Light-64px.png" style="cursor:pointer"/>
@@ -267,8 +245,14 @@ the implementation of vms and hlmplus (Entitlement Management Tools) on Solaris<
                   <label class="label label-primary">Python</label>
                   <label class="label label-primary">Web Crawler</label>
                   <label class="label label-primary">Django</label>
+                  <label class="label label-primary">HTML/CSS/JavaScript/jQuery</label>
+                  <label class="label label-primary">Web Crawler</label>
+                  <label class="label label-primary">Machine Learning</label>
                   <label class="label label-primary">Artificial Intelligance</label>
                   <label class="label label-warning">Java Web(SSH)</label>
+                  <label class="label label-warning">React.js</label>
+                  <label class="label label-warning">MongoDB</label>
+                  <label class="label label-warning">MySQL</label>
                 </td>
               </tr>
             </table>
