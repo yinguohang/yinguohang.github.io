@@ -100,12 +100,27 @@
       });
       $(".side-button").click(function(){
         var target = "#" + $(this).attr("target");
+        /*
         $("#content").children().each(function(){
           $(this).css("display", "none");
         });
-        // $(target).css("display", "block");
+        */
+        $(".side-button").each(function(){
+          var target = "#" + $(this).attr("target");
+          $(target).css("display", "none");
+        });
         $(target).fadeIn("slow");
       });
+      // Initialization
+      $(".side-button").each(function(){
+        var target = "#" + $(this).attr("target");
+        $(target).css("display", "none");
+      });
+      $(".side-button-active").each(function(){
+        var target = "#" + $(this).attr("target");
+        $(target).css("display", "block");
+      });
+      
       $(".disappear").each(function(){
         $(this).text("+ " + $(this).text());
       });
@@ -153,6 +168,7 @@
     <div class="row">
       <div class="col-lg-2 col-sm-12">
         <div class="row">
+          <div class="side-button col-lg-12 col-xs-3 side-button-active" target="info-panel">Info</div>
           <div class="side-button col-lg-12 col-xs-3" target="project-panel">Projects</div>
           <div class="side-button col-lg-12 col-xs-3" target="intern-panel">Internship</div>
           <div class="side-button col-lg-12 col-xs-3" target="activity-panel">Activites</div>
@@ -161,7 +177,7 @@
       </div>
       <div class="col-lg-10 col-sm-12">
         <div id="content" class="col-lg-12">
-          <div id="project-panel">
+          <div id="project-panel" style="display:none">
             <div id="detail" style="display:none">
               <h3 class="return-button">
                 <span class="glyphicon glyphicon-arrow-left"></span> Back
@@ -225,7 +241,38 @@ the implementation of vms and hlmplus (Entitlement Management Tools) on Solaris<
               <hr>
               <h4>Other: Online Bookstore, Whing.top Website, Crawler and Its Information Visualization Website, ...</h4>
             </div>   
-          </div>          
+          </div>
+          <div id="info-panel" style="display:none">
+            <table class="table">
+              <tr>
+                <td>Email:</td>
+                <td>yinguohang@gmail.com<br>guohangy@usc.edu</td>
+              </tr>
+              <tr>
+                <td>LinkedIn:</td>
+                <td><a href="https://www.linkedin.com/in/guohang-yin-302983130/">LinkedIn Mainpage</a></td>
+              </tr>
+              <tr>
+                <td>Leetcode:</td>
+                <td><a href="https://leetcode.com/yinguohang/">Leetcode Mainpage</a></td>
+              </tr>
+              <tr>
+                <td>Github:</td>
+                <td><a href="https://github.com/yinguohang">Github Mainpage</a></td>
+              </tr>
+              <tr>
+                <td>Skills:</td>
+                <td>
+                  <label class="label label-success">C/C++</label>
+                  <label class="label label-primary">Python</label>
+                  <label class="label label-primary">Web Crawler</label>
+                  <label class="label label-primary">Django</label>
+                  <label class="label label-primary">Artificial Intelligance</label>
+                  <label class="label label-warning">Java Web(SSH)</label>
+                </td>
+              </tr>
+            </table>
+          </div>
           <div id="intern-panel" style="display:none">
             <div>
               <h3>Morgan Stanley</h3>
