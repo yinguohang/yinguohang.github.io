@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/phaser@3.15.1/dist/phaser-arcade-physics.min.js"></script>
+</head>
+<body>
+
+    <script>
+    h = 6
+    w = 10
+
+    var config = {
+        type: Phaser.AUTO,
+        width: (2 * w + 1) * 32,
+        height: (2 * h + 1) * 32,
+        physics: {
+            default: 'arcade',
+            arcade: {
+                gravity: { y: 0 }
+            }
+        },
+        scene: [{
+            key: "game",
+            active: true,
+            preload: gamePreload,
+            create: gameCreate,
+            update: gameUpdate
+        }, {
+            key: "board",
+            active: true,
+            preload: boardPreload, 
+            create: boardCreate
+        }]
+    };
+
+    var game = new Phaser.Game(config);
+
+    function gamePreload () {
+        this.load.setBaseURL('http://localhost:8888');
+
+        this.load.image('wall', 'assets/wood.png');
+        this.load.image('star', 'assets/star.png');
+        this.load.spritesheet('player', 'assets/dude.png', {frameWidth: 32, frameHeight: 48});
+    }
+
+    function shuffleArray(array) {
+        for (var i = array.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var temp = array[i];
+            array[i] = array[j];
+            array[j] = temp;
+        }
+    }
+
+    function find(father, c) {
+        if (father[c] == c)
+            return father[c];
+        father[c] = find(father, father[c]);
+        return father[c];
+    }
+
+    function union(father, c1, c2) {
+        f1 = find(father, c1);
+        f2 = find(father, c2);
+        if (f1 == f2) {
+            return;
+        }
+        father[f1] = father[f2];
+    }
+
+    function generateMaze(width, height) {
+        var maze = new Array(2 * height + 1);
+        for (var i = 0; i < 2 * height + 1; i++) {
+            maze[i] = new Array(2 * width + 1);
+        }
+        for (var i = 0; i < 2 * height + 1; i++) {
+            for (var j = 0; j < 2 * width + 1; j++) {
+                if (i == 0 || i == 2 * height || j == 0 || j == 2 * width) {
+                    maze[i][j] = 1;
+                    continue;
+                }
+                if (i % 2 == 0 || j % 2 == 0) {
+                    maze[i][j] = 1;
+                } else {
+                    maze[i][j] = 0;
+                }
+            }
+        }
+        var father = new Array(height * width);
+        for (var i = 0; i < father.length; i++) {
+            father[i] = i;
+        }
+        edges = new Array()
+        for (var i = 0; i < height; i++) {
+            for (var j = 0; j < width - 1; j++) {
+                edges.push([[i, j], [i, j + 1]]);
+            }
+        }
+        for (var j = 0; j < width; j++) {
+            for (var i = 0; i < height - 1; i++) {
+                edges.push([[i, j], [i + 1, j]]);
+            }
+        }
+        shuffleArray(edges);
+        edges.forEach(function (edge) {
+            c1 = edge[0][0] * width + edge[0][1];
+            f1 = find(father, c1);
+            c2 = edge[1][0] * width + edge[1][1];
+            f2 = find(father, c2);
+            if (f1 == f2) {
+                return;
+            }
+            maze[(edge[0][0] + edge[1][0]) + 1][(edge[0][1] + edge[1][1]) + 1] = 0;
+            union(father, c1, c2);
+        });
+        return maze;
+    }
+
+    function renderMaze(maze, that) {
+        platforms = that.physics.add.staticGroup();
+
+        height = maze.length;
+        width = maze[0].length
+        for (var i = 0; i < height; i++) {
+            for (var j = 0; j < width; j++) {
+                if (maze[i][j] == 1) {
+                    // that.add.image(i * 32, j * 32, 'wall').setOrigin(0, 0);
+                    platforms.create(i * 32 + 16, j * 32 + 16, 'wall');
+                }
+            }
+        }
+    }
+
+    function gameCreate () {
+        this.scene.bringToTop();
+
+        this.graphics = this.add.graphics();
+
+        this.graphics.fillStyle(0xFFFFFF, 1.0);
+        this.graphics.fillRect(0, 0, (2 * w + 1) * 32, (2 * h + 1) * 32);
+        var maze = generateMaze(h, w);
+        
+        renderMaze(maze, this);
+
+        player = this.physics.add.sprite(32, 32, 'player').setOrigin(0, 0).setScale(0.5);
+        star = this.physics.add.sprite(2 * w * 32 - 32, 2 * h * 32 - 32, 'star').setOrigin(0, 0);
+
+        timeText = this.add.text(16, 16, 'Time: 0.00s', {fontSize: '16px', fill: '#000'});
+        startTime = new Date();
+
+        // player.setBounce(0.2);
+        // player.setCollideWorldBounds(true);
+
+        this.anims.create({
+            key: 'left',
+            frames: this.anims.generateFrameNumbers('player', { start: 0, end: 3 }),
+            frameRate: 10,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'turn',
+            frames: [ { key: 'player', frame: 4 } ],
+            frameRate: 20
+        });
+
+        this.anims.create({
+            key: 'right',
+            frames: this.anims.generateFrameNumbers('player', { start: 5, end: 8 }),
+            frameRate: 10,
+            repeat: -1
+        });
+
+        this.physics.add.collider(player, platforms);
+        this.physics.add.overlap(player, star, function(player, star) {
+            console.log("success");
+            this.scene.pause();
+            console.log(this.scene.get("board").scene);
+            this.scene.start("board", (new Date() - startTime) / 1000.0);
+            this.scene.bringToTop("board");
+        }, null, this);
+
+
+        cursors = this.input.keyboard.createCursorKeys();
+        console.log(player);
+    }
+
+    function gameUpdate() {
+        timeText.setText("Time: " + (new Date() - startTime) / 1000.0 +  "s");
+        // 7. Adding Keyboard controls
+        if (cursors.left.isDown)
+        {
+            player.setVelocityX(-160);
+            player.setVelocityY(0);
+            player.anims.play('left', true);
+        }
+        else if (cursors.right.isDown)
+        {
+            player.setVelocityX(160);
+            player.setVelocityY(0);
+            player.anims.play('right', true);
+        }
+        else if (cursors.up.isDown)
+        {
+            player.setVelocityX(0);
+            player.setVelocityY(-160);
+            player.anims.play('turn');
+        }
+        else if (cursors.down.isDown) 
+        {
+            player.setVelocityX(0);
+            player.setVelocityY(160);
+            player.anims.play('turn');
+        } 
+        else
+        {
+            player.setVelocityX(0);
+            player.setVelocityY(0);
+            player.anims.play('turn');
+        }
+
+    }
+
+    function boardPreload() {
+
+    }
+
+    function boardCreate(data) {
+        console.log(data);
+        this.graphics = this.add.graphics();
+
+        this.graphics.fillStyle(0xCCCCCC);
+        this.graphics.fillRect(0, 0, (2 * w + 1) * 32, (2 * h + 1) * 32);
+        this.text = this.add.text((2 * w) * 16, (2 * h) * 16 - 16, 'Time: ' + data + 's', {fontSize: '16px', fill: '#000'}).setOrigin(0.5, 0.5);
+        this.restart = this.add.text((2 * w) * 16, (2 * h) * 16, "Press to restart", {fontSize: "16px", fill: "#FFF", backgroundColor: "#000"}).setOrigin(0.5, 0.5);
+        this.restart.setInteractive();
+        this.restart.on("pointerup", function() {
+            this.scene.start("game");
+            this.scene.bringToTop("game");
+        }, this)
+    }
+    </script>
+
+</body>
+</html>
