@@ -36,11 +36,9 @@
     var game = new Phaser.Game(config);
 
     function gamePreload () {
-        this.load.setBaseURL('http://localhost:8888');
-
-        this.load.image('wall', 'assets/wood.png');
-        this.load.image('star', 'assets/star.png');
-        this.load.spritesheet('player', 'assets/dude.png', {frameWidth: 32, frameHeight: 48});
+        this.load.image('wall', 'maze/assets/wood.png');
+        this.load.image('star', 'maze/assets/star.png');
+        this.load.spritesheet('player', 'maze/assets/dude.png', {frameWidth: 32, frameHeight: 48});
     }
 
     function shuffleArray(array) {
