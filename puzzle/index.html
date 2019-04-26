@@ -58,6 +58,10 @@
 		.hint-marked {
 			background: #FF0000;
 		}
+
+		.candidate-character-hidden {
+			display: none !important;
+		}
 	</style>
 	<script type="text/javascript">
 		function shuffle(arra1) {
@@ -369,7 +373,8 @@
 			var releaseCharacter = function(element) {
 				if (!element[0].hasAttribute("candidate"))
 					return;
-				$("#" + element.attr("candidate")).css("display", "inline-block");
+				// $("#" + element.attr("candidate")).css("display", "inline-block");
+				$("#" + element.attr("candidate")).removeClass("candidate-character-hidden")
 				element.text(" ");
 				element.removeClass("matrix-character-filled");
 				element.addClass("matrix-character-blank");
@@ -407,7 +412,7 @@
 				$("#" + x + "_" + y).addClass("matrix-character-filled");
 				$("#" + x + "_" + y).removeClass("matrix-character-blank");
 				$("#" + x + "_" + y).attr("candidate", $(this).attr("id"));
-				$(this).css("display", "none");
+				$(this).addClass("candidate-character-hidden");
 				findBlank();
 				if (isWin()) {
 					showCongratulation();
