@@ -4,12 +4,36 @@
 	<script src="https://code.jquery.com/jquery-3.4.0.min.js"
 	integrity="sha256-BJeo0qm959uMBGb65z40ejJYGSgR7REI4+CW1fNKwOg="
 	crossorigin="anonymous"></script>
+	<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 </head>
 <body style="text-align:center">
-	<button id="restart" type="button">Restart!</button>
+	<div style="max-width: 500px; margin: 0 auto">
+		<form style="">
+		  <div class="form-row">
+		    <div class="col">
+		      <input id="row" type="text" class="form-control" placeholder="Rows" value="6">
+		    </div>
+		    <div class="col">
+		      <input id="col" type="text" class="form-control" placeholder="Columns" value="6">
+		    </div>
+		    <div class="col">
+		      <input id="count" type="text" class="form-control" placeholder="Count" value="6">
+		    </div>
+		    <div class="col">
+		      <input id="prob" type="text" class="form-control" placeholder="Prob"  value="0.5">
+		    </div>
+		    <div class="col">
+		    	<button class="btn btn-primary" id="new-game" type="button">New</button>
+		    </div>
+		  </div>
+		</form>
+	</div>
+	<div>
+		<button class="btn btn-primary" id="restart" type="button">Restart</button>
+		<button class="btn btn-primary" id="hint" type="button">Hint</button>		
+	</div>
 	<div id="matrix"></div>
 	<div id="characters"></div>
-	<button id="hint" type="button">Hint</button>
 	<div id="message"></div>
 	<style type="text/css">
 		.line {
@@ -79,7 +103,7 @@
 			var rtn = [];
 			$.ajax({
 				async: false,
-				url: "dict_small.txt",
+				url: "http://yinguohang.github.io/puzzle/dict_small.txt",
 				success: function (data) {
 					rtn = data.split(/\s/).filter((x) => x.length == 4);
 				}
@@ -369,6 +393,17 @@
 			}
 		}
 
+		function releaseCharacter(element) {
+			if (!element[0].hasAttribute("candidate"))
+				return;
+			// $("#" + element.attr("candidate")).css("display", "inline-block");
+			$("#" + element.attr("candidate")).removeClass("candidate-character-hidden")
+			element.text(" ");
+			element.removeClass("matrix-character-filled");
+			element.addClass("matrix-character-blank");
+			element.removeAttr("candidate");
+		}
+
 		function addEventListeners() {
 			var releaseCharacter = function(element) {
 				if (!element[0].hasAttribute("candidate"))
@@ -431,12 +466,15 @@
 			findBlank();
 		}
 
-		m = n = 10;
-
-		function renderGame() {
+		function initilize() {
 			dict = getDict();
 			index = buildIndex(dict);
-			rtn = generate(dict, index, m, n, 6, 0.5);
+		}
+
+		function renderGame() {
+			m = parseInt($("#row").val());
+			n = parseInt($("#col").val());
+			rtn = generate(dict, index, m, n, parseFloat($("#count").val()), parseFloat($("#prob").val()));
 			answer = rtn[0];
 			puzzle = rtn[1];
 			candidates = rtn[2];
@@ -446,6 +484,12 @@
 			drawBackground();
 			loadPuzzle();
 			addEventListeners();	
+		}
+
+		function recoverAll() {
+			$(".matrix-character-filled").each(function() {
+				releaseCharacter($(this));
+			});
 		}
 
 		$(function() {
@@ -465,8 +509,10 @@
 			// candidates = ["十", "山", "火", "水"];
 
 			
-			$("#restart").on("click", renderGame);
+			$("#restart").on("click", recoverAll);
 			$("#hint").on("click", showHint);
+			$("#new-game").on("click", renderGame);
+			initilize();
 			renderGame();
 		});
 	</script>
