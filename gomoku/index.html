@@ -123,15 +123,15 @@
 			var score = null
 			var rtn = [-1, -1]
 			var candidates = getCandidates(board)
-			console.log("getMin", candidates)
+			// console.log("getMin", candidates)
 			if (layer == 0) {
 				for (var i = 0; i < candidates.length; i++) {
 					var x = candidates[i][1]
 					var y = candidates[i][2]
 					board[x][y] = 2
-					console.log("Min Start", x, y)
+					// console.log("Min Start", x, y)
 					s = evaluate(board, 1)
-					console.log("Min End", x, y, s[0])
+					// console.log("Min End", x, y, s[0])
 					board[x][y] = 0
 					if (score == null || score > s) {
 						score = s
@@ -144,9 +144,9 @@
 				var x = candidates[i][1]
 				var y = candidates[i][2]
 				board[x][y] = 2
-				console.log("Min Start", x, y)
+				// console.log("Min Start", x, y)
 				s = getMax(board, layer - 1)
-				console.log("Min End", x, y, s[0])
+				// console.log("Min End", x, y, s[0])
 				board[x][y] = 0
 				if (score == null || score > s[0]) {
 					score = s[0]
@@ -166,7 +166,7 @@
 					var y = candidates[i][2]
 					board[x][y] = 1
 					s = evaluate(board)
-					console.log("Max", x, y, s)
+					// console.log("Max", x, y, s)
 					board[x][y] = 0
 					if (score == null || score < s) {
 						score = s
@@ -320,7 +320,7 @@
 			board[i][j] = 1
 			renderPiece(i, j, 1, ctx)
 
-			console.log(board)
+			// console.log(board)
 			var rst = gameOverDetection(board)
 			if (rst[0]) {
 				document.getElementById("message").innerHTML = "YOU WIN!"
