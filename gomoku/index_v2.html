@@ -5,14 +5,9 @@
 	<title>Gomoku</title>
 </head>
 <body>
-	<div id="message" style="height: 30px;text-align: center;color: red;font-weight: bold;font-size: 30px;"></div>
-	<div id="position" style="height: 30px;text-align: center;color: red;font-weight: bold;font-size: 30px;"></div>
-	<div style="text-align:center">
-		<canvas id="canvas" width="500" height="500"></canvas>
-	</div>
-	<div style="text-align:center">
-		<button type="button" onclick="redo()">Redo</button>
-	</div>
+	<div id="message" style="width: 500px;height: 30px;text-align: center;color: red;font-weight: bold;font-size: 30px;"></div>
+	<div id="position" style="width: 500px;height: 30px;text-align: center;color: red;font-weight: bold;font-size: 30px;"></div>
+	<canvas id="canvas" width="500" height="500"></canvas>
 	<script type="text/javascript">
 		boardOffset = 25
 		boardSize = 15
@@ -22,8 +17,7 @@
 		canvasHeight = 500
 		oneDir = [[0, 1], [1, 0], [-1, 0], [0, -1]]
 		twoDir = [[0, 2], [2, 0], [-2, 0], [0, -2], [1, 1], [1, -1], [-1, -1], [-1, 1]]
-		trace = []
-
+										
 		function evaluate(board, nextPiece=2) {
 			dirs = [[0, 1], [1, 0], [1, 1], [1, -1]]
 			getVal = function(i, j) {
@@ -54,9 +48,19 @@
 							}
 							l++
 						}
-						var pos = board[i][j] == 1 ? 1 : (nextPiece == 2 ? -4 : -0.25)
+						var pos = board[i][j] == 1 ? 1 : (nextPiece == 2 ? -5 : -0.2)
+						var emptyMul = 0
+						switch (empty) {
+						case 1:
+							emptyMul = 1
+							break
+						case 2:
+							emptyMul = 10
+							break
+						}
 						var success = l == 5 ? 100 : 1
-						score += pos * Math.pow(10, 2 * l + empty - 6) * success
+						if (l == 5) emptyMul = 10
+						score += pos * emptyMul * Math.pow(10, l - 1) * success
 					}
 				}
 			}
@@ -115,62 +119,78 @@
 			return candidates.sort(function(a, b){return b[0] - a[0]})
 		}
 
-		function getMin(board, layer, alpha, beta) {
+		function getMin(board, layer) {
+			var score = null
 			var rtn = [-1, -1]
 			var candidates = getCandidates(board)
-
+			console.log("getMin", candidates)
+			if (layer == 0) {
+				for (var i = 0; i < candidates.length; i++) {
+					var x = candidates[i][1]
+					var y = candidates[i][2]
+					board[x][y] = 2
+					console.log("Min Start", x, y)
+					s = evaluate(board, 1)
+					console.log("Min End", x, y, s[0])
+					board[x][y] = 0
+					if (score == null || score > s) {
+						score = s
+						rtn = [x, y]
+					}
+				}
+				return [score, rtn]
+			}			
 			for (var i = 0; i < candidates.length; i++) {
 				var x = candidates[i][1]
 				var y = candidates[i][2]
 				board[x][y] = 2
-				if (layer == 0) {
-					s = evaluate(board, 1)
-				} else {
-					s = getMax(board, layer - 1, alpha, beta)[0]
-				}
+				console.log("Min Start", x, y)
+				s = getMax(board, layer - 1)
+				console.log("Min End", x, y, s[0])
 				board[x][y] = 0
-				if (beta > s) {
-					beta = s
+				if (score == null || score > s[0]) {
+					score = s[0]
 					rtn = [x, y]
 				}
-				console.log("Min", layer, alpha, beta, s, x, y)
-				// alpha-beta prunning
-				if (alpha >= beta) {
-					return [beta, rtn] 
-				}
 			}
-			return [beta, rtn]
+			return [score, rtn]
 		}
 
-		function getMax(board, layer, alpha, beta) {
+		function getMax(board, layer) {
+			var score = null
 			var rtn = [-1, -1]
 			var candidates = getCandidates(board)
-
+			if (layer == 0) {
+				for (var i = 0; i < candidates.length; i++) {
+					var x = candidates[i][1]
+					var y = candidates[i][2]
+					board[x][y] = 1
+					s = evaluate(board)
+					console.log("Max", x, y, s)
+					board[x][y] = 0
+					if (score == null || score < s) {
+						score = s
+						rtn = [x, y]
+					}
+				}
+				return [score, rtn]
+			}
 			for (var i = 0; i < candidates.length; i++) {
 				var x = candidates[i][1]
 				var y = candidates[i][2]
 				board[x][y] = 1
-				if (layer == 0) {
-					s = evaluate(board)
-				} else {
-					s = getMin(board, layer - 1, alpha, beta)[0]
-				}
+				s = getMin(board, layer - 1)
 				board[x][y] = 0
-				if (alpha < s) {
-					alpha = s
+				if (score == null || score < s[0]) {
+					score = s[0]
 					rtn = [x, y]
 				}
-				console.log("Max", layer, alpha, beta, s, x, y)
-				// alpha-beta prunning
-				if (alpha >= beta) {
-					return [alpha, rtn] 
-				}
 			}
-			return [alpha, rtn]
+			return [score, rtn]
 		}
 
 		function getMinMaxNextStep(board) {
-			return getMin(board, 3, -1e10, 1e10)[1]
+			return getMin(board, 1)[1]
 		}
 
 		function gameOverDetection(board) {
@@ -205,12 +225,12 @@
 			return [false]
 		}
 
-		function render(board) {
-			renderBlankBoard()
+		function render(board, ctx) {
+			renderBlankBoard(ctx)
 			for (var i = 0; i <= boardSize; i++) {
-				for (var j = 0; j <= boardSize; j++) {
+				for (var j = 0; j < boardSize; j++) {
 					if (board[i][j] != 0) {
-						renderPiece(i, j, board[i][j])
+						renderPiece(i, j, board[i][j], ctx)
 					}
 				} 
 			}
@@ -228,19 +248,7 @@
 			ctx.stroke();
 		}
 
-		function redo() {
-			if (trace.length < 2) return;
-			tmp = trace.pop()
-			board[tmp[0]][tmp[1]] = 0
-			tmp = trace.pop()
-			board[tmp[0]][tmp[1]] = 0
-			ctx.clearRect(0, 0, canvasWidth, canvasHeight)
-			render(board)
-			snapshot = cvs.toDataURL()	
-			document.getElementById("message").innerHTML = ""
-		}
-
-		function renderPiece(i, j, color) {
+		function renderPiece(i, j, color, ctx) {
 			ctx.beginPath();					
 			ctx.arc(boardOffset + boardGridSize * i, boardOffset + boardGridSize * j, pieceRadius, 0, 360, false);
 			switch (color) {
@@ -261,11 +269,19 @@
 		}
 
 		board = Array.from(Array(boardSize + 1), () => new Array(boardSize + 1).fill(0))
+		// board[5][5] = 1
+		// board[5][6] = 1
+		// board[5][7] = 1
+		// board[5][8] = 1
+		// board[6][5] = 2
+		// board[6][6] = 2
+		// board[6][7] = 2
+		// board[6][8] = 2
 
 		cvs = document.getElementById("canvas");
 		ctx = cvs.getContext("2d");
 		
-		render(board)
+		render(board, ctx)
 		snapshot = cvs.toDataURL()
 
 		prevI = prevJ = -1
@@ -302,10 +318,9 @@
 				return;
 			}
 			board[i][j] = 1
-			trace.push([i, j, 1])
 			renderPiece(i, j, 1, ctx)
 
-			// console.log(board)
+			console.log(board)
 			var rst = gameOverDetection(board)
 			if (rst[0]) {
 				document.getElementById("message").innerHTML = "YOU WIN!"
@@ -316,12 +331,9 @@
 			var AIpiece = getMinMaxNextStep(board)
 			if (AIpiece[0] < 0) {
 				document.getElementById("message").innerHTML = "DRAW!"	
-				snapshot = cvs.toDataURL()
-				return
 			}
 			board[AIpiece[0]][AIpiece[1]] = 2
-			trace.push([AIpiece[0], AIpiece[1], 2])
-			renderPiece(AIpiece[0], AIpiece[1], 2)
+			renderPiece(AIpiece[0], AIpiece[1], 2, ctx)
 
 			var rst = gameOverDetection(board)
 			if (rst[0]) {

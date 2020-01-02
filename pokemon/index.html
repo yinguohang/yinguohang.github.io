@@ -1,0 +1,177 @@
+<html>
+<head>
+  <title>Pokemon</title>
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div id="chart">
+  </div>
+  <style>
+    .type-tag{
+      border-radius: 25%;
+      width: 3em;
+      height: 1em;
+      text-align: center;
+      border: grey solid 2px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .combine-column-header{
+      width: 3em;
+    }
+    .not-very-effective{
+      background: red;
+      color: white;
+    }
+    .super-effective{
+      background: green;
+      color: white;
+    }
+    .not-effective{
+      background: black;
+      color: white;
+    }
+    .effective{
+      background: white;
+      color: black;
+    }
+    .column-grey{
+      background: grey !important;
+    }
+    .column-hide{
+      display: none;
+    }
+  </style>
+  <script type="text/javascript">
+    selected = new Set()
+
+    function updateColumns() {
+      $(".type-tag").each(function(index) {
+        var c = $(this).attr("col")
+        if (selected.size == 0) {
+          $(".col-" + c).removeClass("column-grey")  
+          $(".col-" + c).removeClass("column-hide")    
+          return
+        }
+        if (selected.size == 1) {
+          if (selected.has(c)) {
+            $(".col-" + c).removeClass("column-grey")  
+            $(".col-" + c).removeClass("column-hide")    
+           } else {
+            $(".col-" + c).addClass("column-grey")
+            $(".col-" + c).removeClass("column-hide")    
+           }  
+          return
+        }
+        // Only show seleted two lines.
+        if (selected.has(c)) {
+          $(".col-" + c).removeClass("column-grey")  
+          $(".col-" + c).removeClass("column-hide")    
+         } else {
+          $(".col-" + c).removeClass("column-grey")
+          $(".col-" + c).addClass("column-hide")    
+         }          
+      });
+      if (selected.size != 2) {
+        $(".col-combine").addClass("column-hide")        
+        return
+      }
+      $(".col-combine").removeClass("column-hide")
+      $(".col-combine").each(function(index){
+         if ($(this).hasClass("combine-column-header")) {
+          return
+         }
+         var r = $(this).attr("row")
+         var v = 1
+         $(".row-" + r + ":not(.column-hide):not(.col-combine)").each(function(){
+          v *= $(this).text()
+          console.log("in", $(this), v)
+         })
+         console.log($(this), v)
+         $(this).text(v)
+         if (v >= 2) {
+          $(this).addClass("super-effective")
+          $(this).removeClass("effective")
+          $(this).removeClass("not-very-effective")
+          $(this).removeClass("not-effective")
+          return
+         }
+         if (v == 1) {
+          $(this).removeClass("super-effective")
+          $(this).addClass("effective")
+          $(this).removeClass("not-very-effective")
+          $(this).removeClass("not-effective")
+          return 
+         }
+         if (v == 0) {
+          $(this).removeClass("super-effective")
+          $(this).removeClass("effective")
+          $(this).removeClass("not-very-effective")
+          $(this).addClass("not-effective")
+          return 
+         }
+         $(this).removeClass("super-effective")
+         $(this).removeClass("effective")
+         $(this).addClass("not-very-effective")
+         $(this).removeClass("not-effective")
+         return 
+      })
+    }
+    function clickColumn(colTag) {
+      var column = $(colTag).attr("col")
+      if (selected.has(column)) {
+        selected.delete(column)
+      } else {
+        if (selected.size >= 2) {
+          console.log("Please de-select one column first!")
+          return
+        }
+        selected.add(column)
+      }
+      updateColumns()
+    }
+    $(function(){
+      $.ajax({
+        url: "./types.json",
+      }).done(function(data){
+        typesData = data
+        var types = Object.keys(data)
+        var l = types.length
+        var table = $("<table></table>")
+        $("#chart").append(table)
+
+        // Header
+        var tr = $("<tr><td></td></tr>")
+        table.append(tr)
+        for (var i = 0; i < l; i++) {
+          var td = $('<td class="type-tag col-' + i +'" col="' + i + '"style="background: ' + data[types[i]]["color"] + '" onclick="javascript: clickColumn(this)">' + data[types[i]]["names"]["zh"] + "</td>")
+          tr.append(td)
+        }
+        tr.append($('<td class="combine-column-header col-combine"></td>'))
+
+        for (var i = 0; i < l; i++) {
+          var tr = $("<tr></tr>")
+          table.append(tr)
+          var td = $('<td class="type-tag" style="background: ' + data[types[i]]["color"] + '">' + data[types[i]]["names"]["zh"] + "</td>")
+          tr.append(td)
+          for (var j = 0; j < l; j++) {
+            var v = data[types[i]]["effectiveness"][types[j]]
+            var td = $('<td class="row-' + i + ' col-' + j + '" style=\"text-align: center;">' + v + "</td>")
+            if (v == 0.5) {
+              td.addClass("not-very-effective")
+            } else if (v == 2) {
+              td.addClass("super-effective")
+            } else if (v == 0) {
+              td.addClass("not-effective")
+            } else {
+              td.addClass("effective")
+            }
+            tr.append(td)
+          }
+          tr.append($('<td class="row-' + i + ' col-combine column-hide" row="' + i + '" style=\"text-align: center;"></td>'))
+        }
+      })
+    })
+  </script>
+</body>
+</html>
