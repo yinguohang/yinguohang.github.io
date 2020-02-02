@@ -1,9 +1,15 @@
 <html>
 <head>
   <title>Pokemon</title>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
+  <meta name="name" charset="utf-8">
   <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
 </head>
 <body>
+  <div style="text-align: center">
+    <input id="name" />
+  </div>
   <div id="chart">
   </div>
   <style>
@@ -85,9 +91,9 @@
          var v = 1
          $(".row-" + r + ":not(.column-hide):not(.col-combine)").each(function(){
           v *= $(this).text()
-          console.log("in", $(this), v)
+          // console.log("in", $(this), v)
          })
-         console.log($(this), v)
+         // console.log($(this), v)
          $(this).text(v)
          if (v >= 2) {
           $(this).addClass("super-effective")
@@ -117,8 +123,14 @@
          return 
       })
     }
-    function clickColumn(colTag) {
-      var column = $(colTag).attr("col")
+    
+    function reset() {
+      selected.clear()
+      updateColumns()
+    }
+
+    function flipColumn(col) {
+      var column = "" + col
       if (selected.has(column)) {
         selected.delete(column)
       } else {
@@ -130,47 +142,87 @@
       }
       updateColumns()
     }
+    
+    function setTable(data){
+      typesData = data
+      types = Object.keys(data)
+      type2Index = Array()
+      var l = types.length
+      var table = $("<table></table>")
+      $("#chart").append(table)
+
+      // Header
+      var tr = $("<tr><td></td></tr>")
+      table.append(tr)
+      for (var i = 0; i < l; i++) {
+        type2Index[types[i]] = i
+        var td = $('<td class="type-tag col-' + i +'" col="' + i + '"style="background: ' + data[types[i]]["color"] + '" onclick="javascript: flipColumn(' + i + ')">' + data[types[i]]["names"]["zh"] + "</td>")
+        tr.append(td)
+      }
+      tr.append($('<td class="combine-column-header col-combine"></td>'))
+
+      for (var i = 0; i < l; i++) {
+        var tr = $("<tr></tr>")
+        table.append(tr)
+        var td = $('<td class="type-tag" style="background: ' + data[types[i]]["color"] + '">' + data[types[i]]["names"]["zh"] + "</td>")
+        tr.append(td)
+        for (var j = 0; j < l; j++) {
+          var v = data[types[i]]["effectiveness"][types[j]]
+          var td = $('<td class="row-' + i + ' col-' + j + '" style=\"text-align: center;">' + v + "</td>")
+          if (v == 0.5) {
+            td.addClass("not-very-effective")
+          } else if (v == 2) {
+            td.addClass("super-effective")
+          } else if (v == 0) {
+            td.addClass("not-effective")
+          } else {
+            td.addClass("effective")
+          }
+          tr.append(td)
+        }
+        tr.append($('<td class="row-' + i + ' col-combine column-hide" row="' + i + '" style=\"text-align: center;"></td>'))
+      }
+    }
+
+    function setPokemon(data) {
+      pokemons = Array()
+      for (var i = 0; i < data.length; i++) {
+        py = data[i]["name-pinyin"]
+        pokemons.push(
+          {
+            "text": data[i]["index"] + " " + data[i]["name"] + " / " + data[i]["name-zh-cn"] + " / " + data[i]["name-zh-tw"] + " [" + data[i]["types"].map(function(x){ return typesData[x]["names"]["zh"] }).join("/") + "]",
+            "abbr": py.map(function(x) {return x[0]}).join(""),
+            "pinyin": py.join(""),
+            "types": data[i]["types"]
+          })
+      }
+      $("#name").autocomplete({
+        source: function(req, res) {
+          l = []
+          s = req["term"]
+          for (var i = 0; i < pokemons.length; i++) {
+            if (pokemons[i]["text"].indexOf(s) >= 0 || pokemons[i]["abbr"].indexOf(s) >= 0 || pokemons[i]["pinyin"].indexOf(s) >= 0) {
+              l.push(pokemons[i]["text"])
+            } 
+          }
+          res(l)
+        },
+        select: function(event, ui) {
+          var index = parseInt(ui.item.value.split(" ")) - 1
+          console.log(pokemons[index]["types"])
+          reset()
+          pokemons[index]["types"].forEach(function (x) {flipColumn(type2Index[x])})
+        } 
+      })
+    }
+
     $(function(){
       $.ajax({
         url: "./types.json",
-      }).done(function(data){
-        typesData = data
-        var types = Object.keys(data)
-        var l = types.length
-        var table = $("<table></table>")
-        $("#chart").append(table)
-
-        // Header
-        var tr = $("<tr><td></td></tr>")
-        table.append(tr)
-        for (var i = 0; i < l; i++) {
-          var td = $('<td class="type-tag col-' + i +'" col="' + i + '"style="background: ' + data[types[i]]["color"] + '" onclick="javascript: clickColumn(this)">' + data[types[i]]["names"]["zh"] + "</td>")
-          tr.append(td)
-        }
-        tr.append($('<td class="combine-column-header col-combine"></td>'))
-
-        for (var i = 0; i < l; i++) {
-          var tr = $("<tr></tr>")
-          table.append(tr)
-          var td = $('<td class="type-tag" style="background: ' + data[types[i]]["color"] + '">' + data[types[i]]["names"]["zh"] + "</td>")
-          tr.append(td)
-          for (var j = 0; j < l; j++) {
-            var v = data[types[i]]["effectiveness"][types[j]]
-            var td = $('<td class="row-' + i + ' col-' + j + '" style=\"text-align: center;">' + v + "</td>")
-            if (v == 0.5) {
-              td.addClass("not-very-effective")
-            } else if (v == 2) {
-              td.addClass("super-effective")
-            } else if (v == 0) {
-              td.addClass("not-effective")
-            } else {
-              td.addClass("effective")
-            }
-            tr.append(td)
-          }
-          tr.append($('<td class="row-' + i + ' col-combine column-hide" row="' + i + '" style=\"text-align: center;"></td>'))
-        }
-      })
+      }).done(setTable);
+      $.ajax({
+        url: "./pokemon_types.json",        
+      }).done(setPokemon)
     })
   </script>
 </body>
